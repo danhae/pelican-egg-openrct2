@@ -1,0 +1,53 @@
+# OpenRCT2 Pelican egg — compatibility fix
+
+Maintained by [danhae](https://github.com/danhae). Based on the [Pelican Eggs OpenRCT2 egg](https://github.com/pelican-eggs/games-standalone/tree/main/openrct2), originally authored by David Wolfe (Red-Thirten) and parkervcp.
+
+[Download the egg JSON](https://raw.githubusercontent.com/danhae/pelican-egg-openrct2/main/egg-open-r-c-t2.json)
+
+## Why I made this
+
+My OpenRCT2 server failed before it could even print its version:
+
+```text
+./OpenRCT2/openrct2-cli: error while loading shared libraries:
+libicuuc.so.72: cannot open shared object file: No such file or directory
+```
+
+The original egg explicitly downloaded `Linux-bookworm-x86_64.tar.gz` (Debian 12). The current Dockerfile for `ghcr.io/parkervcp/yolks:debian` uses Debian 13 (Trixie). The Bookworm binary expects ICU 72, which was unavailable in the running container. This failure occurs before loading RCT2 game files; replacing `g1.dat` or `g2.dat` cannot fix it.
+
+I changed the release asset selector to `Linux-trixie-x86_64.tar.gz` to match the current runtime. OpenRCT2 v0.5.5 provides this asset. I also enabled installation failure handling with `set -e`, added curl HTTP-error checking, and made unknown release tags fail instead of falling back to an unfiltered list of downloads.
+
+## Install or update in Pelican
+
+1. Back up your server files, especially `ServerData`, parks, configuration, and original game assets.
+2. Download the JSON above and import it as an egg, or update your existing OpenRCT2 egg with it. Ensure your server uses the updated egg and installation script.
+3. Keep the runtime image `ghcr.io/parkervcp/yolks:debian`.
+4. Set **OpenRCT2 Version** to `v0.5.5` (asset availability checked) or `latest`. Other release tags must provide a Trixie x86_64 asset. Use matching client/server versions.
+5. Assign a valid primary server allocation. If the rendered startup command says `--port 0`, correct the allocation before starting.
+6. For the first start, set **Load Latest Autosave** to `false` and select an existing park using **Save File**. The inherited autosave selector assumes an appropriate autosave exists; an empty autosave directory can otherwise be selected as the input.
+7. Run **Reinstall** to replace the OpenRCT2 binaries, then start the server. A restart alone does not replace the Bookworm build.
+
+The inherited installer replaces `OpenRCT2` and a working directory named `temp`. Keep your own files out of those directories before reinstalling. The `develop` source-build option is inherited and has not been validated for this fix; use a release for this documented path.
+
+## Updates and subscribing
+
+The egg's `meta.update_url` points to the JSON in **this repository**. Where your Pelican version supports egg updates from that URL, use that function to retrieve future changes. This field alone does not guarantee automatic updates or reinstall running servers.
+
+To subscribe on GitHub, click **Watch → All Activity**. You can also use **Custom → Releases** for release notifications; new commits alone do not generate release notifications.
+
+## Validation and limitations
+
+- Egg JSON parses successfully and the embedded installer passes `bash -n`.
+- The official v0.5.5 release includes the selected Trixie x86_64 archive.
+- A full installation and successful startup of this modified egg have **not yet been verified** on a Pelican host. This is a targeted compatibility correction, not a claim that all possible runtime issues are resolved.
+- The generic `:debian` image tag is mutable. If it changes Debian versions again, the runtime and selected OpenRCT2 build must be reviewed together.
+- Original RCT2 assets are not included. Supply your own game data as required. OpenRCT2's own data files must match the installed OpenRCT2 version.
+- Docker images, OpenRCT2 releases, and the upstream default park remain external dependencies.
+
+## Sources and credits
+
+- [Original egg](https://github.com/pelican-eggs/games-standalone/tree/main/openrct2)
+- [Runtime Dockerfile](https://github.com/parkervcp/yolks/blob/master/oses/debian/Dockerfile)
+- [OpenRCT2 v0.5.5](https://github.com/OpenRCT2/OpenRCT2/releases/tag/v0.5.5)
+
+Original author credits and the MIT license are retained. Fork maintainer contact: pommesmail@danielhaehnel.de.
