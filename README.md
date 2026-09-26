@@ -1,5 +1,7 @@
 # OpenRCT2 Pelican egg — compatibility fix
 
+![Official OpenRCT2 icon](assets/openrct2-icon.png)
+
 Maintained by [danhae](https://github.com/danhae). Based on the [Pelican Eggs OpenRCT2 egg](https://github.com/pelican-eggs/games-standalone/tree/main/openrct2), originally authored by David Wolfe (Red-Thirten) and parkervcp.
 
 [Download the egg JSON](https://raw.githubusercontent.com/danhae/pelican-egg-openrct2/main/egg-open-r-c-t2.json)
@@ -13,7 +15,7 @@ My OpenRCT2 server failed before it could even print its version:
 libicuuc.so.72: cannot open shared object file: No such file or directory
 ```
 
-The original egg explicitly downloaded `Linux-bookworm-x86_64.tar.gz` (Debian 12). The current Dockerfile for `ghcr.io/parkervcp/yolks:debian` uses Debian 13 (Trixie). The Bookworm binary expects ICU 72, which was unavailable in the running container. This failure occurs before loading RCT2 game files; replacing `g1.dat` or `g2.dat` cannot fix it.
+The original egg explicitly downloaded `Linux-bookworm-x86_64.tar.gz` (Debian 12). The current Dockerfile for `ghcr.io/parkervcp/yolks:debian` uses Debian 13 (Trixie). The Bookworm binary expects ICU 72, which was unavailable in the running container.
 
 I changed the release asset selector to `Linux-trixie-x86_64.tar.gz` to match the current runtime. OpenRCT2 v0.5.5 provides this asset. I also enabled installation failure handling with `set -e`, added curl HTTP-error checking, and made unknown release tags fail instead of falling back to an unfiltered list of downloads.
 
@@ -51,3 +53,5 @@ To subscribe on GitHub, click **Watch → All Activity**. You can also use **Cus
 - [OpenRCT2 v0.5.5](https://github.com/OpenRCT2/OpenRCT2/releases/tag/v0.5.5)
 
 Original author credits and the MIT license are retained. Fork maintainer contact: pommesmail@danielhaehnel.de.
+
+Icon: [official OpenRCT2 artwork](https://github.com/OpenRCT2/OpenRCT2/blob/develop/resources/logo/icon_x256.png), credited to the OpenRCT2 project; not generated artwork.
