@@ -31,12 +31,6 @@ I changed the release asset selector to `Linux-trixie-x86_64.tar.gz` to match th
 
 The inherited installer replaces `OpenRCT2` and a working directory named `temp`. Keep your own files out of those directories before reinstalling. The `develop` source-build option is inherited and has not been validated for this fix; use a release for this documented path.
 
-## Updates and subscribing
-
-The egg's `meta.update_url` points to the JSON in **this repository**. Where your Pelican version supports egg updates from that URL, use that function to retrieve future changes. This field alone does not guarantee automatic updates or reinstall running servers.
-
-To subscribe on GitHub, click **Watch → All Activity**. You can also use **Custom → Releases** for release notifications; new commits alone do not generate release notifications.
-
 ## Validation and limitations
 
 - Egg JSON parses successfully and the embedded installer passes `bash -n`.
