@@ -4,7 +4,7 @@
 
 Maintained by [danhae](https://github.com/danhae). Based on the [Pelican Eggs OpenRCT2 egg](https://github.com/pelican-eggs/games-standalone/tree/main/openrct2), originally authored by David Wolfe (Red-Thirten) and parkervcp.
 
-[Download the egg JSON](https://raw.githubusercontent.com/danhae/pelican-egg-openrct2/main/egg-open-r-c-t2.json)
+[Download the egg JSON](https://raw.githubusercontent.com/danhae/pelican-egg-openrct2/main/egg-openrct2.json)
 
 ## Why I made this
 
