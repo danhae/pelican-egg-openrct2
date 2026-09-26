@@ -10,14 +10,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect release dependencies in the runtime
+      - name: Extract and check egg installer
+        run: |
+          python3 - <<'PY'
+          import json, pathlib
+          egg = json.loads(pathlib.Path('egg-openrct2.json').read_text())
+          pathlib.Path('install.sh').write_text(egg['scripts']['installation']['script'])
+          PY
+          bash -n install.sh
+      - name: Install using the egg
         run: |
           mkdir -p test-server
-          curl -fL https://github.com/OpenRCT2/OpenRCT2/releases/download/v0.5.5/OpenRCT2-v0.5.5-Linux-trixie-x86_64.tar.gz | tar -xz -C test-server
-          docker run --rm --user root --entrypoint /bin/bash -v "$PWD/test-server:/home/container" ghcr.io/parkervcp/yolks:debian -lc '
-            export LD_LIBRARY_PATH=/home/container/OpenRCT2/lib
-            apt-get update -qq
-            apt-get install -y --no-install-recommends libfontconfig1
-            ldd /home/container/OpenRCT2/openrct2-cli
+          docker run --rm -e VERSION=v0.5.5 -v "$PWD/test-server:/mnt/server" -v "$PWD/install.sh:/install.sh:ro" debian:trixie-slim bash /install.sh
+      - name: Test unmodified runtime as server user
+        run: |
+          chmod -R a+rX test-server
+          docker run --rm --user container --entrypoint /bin/bash -e LD_LIBRARY_PATH=/home/container/OpenRCT2/lib -v "$PWD/test-server:/home/container:ro" ghcr.io/parkervcp/yolks:debian -c '
+            set -e
+            ldd /home/container/OpenRCT2/openrct2-cli | tee /tmp/dependencies.txt
+            if grep -q "not found" /tmp/dependencies.txt; then exit 1; fi
             /home/container/OpenRCT2/openrct2-cli --version
           '
