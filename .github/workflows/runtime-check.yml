@@ -24,7 +24,7 @@ jobs:
           docker run --rm -e VERSION=v0.5.5 -v "$PWD/test-server:/mnt/server" -v "$PWD/install.sh:/install.sh:ro" debian:trixie-slim bash /install.sh
       - name: Test unmodified runtime as server user
         run: |
-          chmod -R a+rX test-server
+          sudo chmod -R a+rX test-server
           docker run --rm --user container --entrypoint /bin/bash -e LD_LIBRARY_PATH=/home/container/OpenRCT2/lib -v "$PWD/test-server:/home/container:ro" ghcr.io/parkervcp/yolks:debian -c '
             set -e
             ldd /home/container/OpenRCT2/openrct2-cli | tee /tmp/dependencies.txt

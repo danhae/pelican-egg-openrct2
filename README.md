@@ -19,6 +19,12 @@ The original egg explicitly downloaded `Linux-bookworm-x86_64.tar.gz` (Debian 12
 
 I changed the release asset selector to `Linux-trixie-x86_64.tar.gz` to match the current runtime. OpenRCT2 v0.5.5 provides this asset. I also enabled installation failure handling with `set -e`, added curl HTTP-error checking, and made unknown release tags fail instead of falling back to an unfiltered list of downloads.
 
+## Follow-up: missing Fontconfig
+
+After switching to the Trixie build, the server reported `libfontconfig.so.1` missing. The generic runtime does not include Fontconfig. I updated the installation container to `debian:trixie-slim` and made the installer copy Fontconfig and its required shared libraries into `OpenRCT2/lib`. The egg's existing `LD_LIBRARY_PATH` loads them there at runtime. Installing packages only inside the temporary installer container would not fix the server container.
+
+The GitHub Actions workflow installs the actual egg into a shared directory, then checks `ldd` and runs `openrct2-cli --version` as the normal server user inside the unmodified runtime image. This checks library loading, not multiplayer connectivity or a complete park-hosting session.
+
 ## Install or update in Pelican
 
 1. Back up your server files, especially `ServerData`, parks, configuration, and original game assets.
@@ -35,7 +41,7 @@ The inherited installer replaces `OpenRCT2` and a working directory named `temp`
 
 - Egg JSON parses successfully and the embedded installer passes `bash -n`.
 - The official v0.5.5 release includes the selected Trixie x86_64 archive.
-- A full installation and successful startup of this modified egg have **not yet been verified** on a Pelican host. This is a targeted compatibility correction, not a claim that all possible runtime issues are resolved.
+- Successful park hosting on a Pelican host still requires confirmation. The automated runtime check covers installation and binary loading; it does not test server allocations, game assets, or multiplayer connectivity.
 - The generic `:debian` image tag is mutable. If it changes Debian versions again, the runtime and selected OpenRCT2 build must be reviewed together.
 - Original RCT2 assets are not included. Supply your own game data as required. OpenRCT2's own data files must match the installed OpenRCT2 version.
 - Docker images, OpenRCT2 releases, and the upstream default park remain external dependencies.
